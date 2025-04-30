@@ -1,0 +1,65 @@
+[
+    {
+      "name": "International Women's Day",
+      "date": "03-08",
+      "countries": ["Russia", "Ukraine", "Belarus"],
+      "languages": ["RUS", "UA", "ENG"],
+      "categories": ["flowers", "gifts", "sweets"],
+      "insights": [
+        { "description": "International Women's Day" },
+        { "description": "Day of spring and beauty" },
+        { "description": "A great reason to please loved ones" }
+      ],
+      "offers": [
+        {
+          "type": "promocode",
+          "code": "WOMEN20",
+          "description": "20% off bouquets",
+          "categories": ["flowers"],
+          "valid_until": "2024-03-15"
+        }
+      ],
+      "service_advantages": [
+        { "description": "Wide selection of bouquets" },
+        { "description": "Fast and convenient delivery" },
+        { "description": "Freshness guarantee" }
+      ],
+      "collections": [
+        {
+          "name": "Spring collection",
+          "categories": ["flowers"]
+        }
+      ]
+    },
+    {
+      "name": "Eid al-Fitr",
+      "date": "floating",
+      "countries": ["UAE"],
+      "languages": ["ENG", "RUS", "AZ"],
+      "categories": ["gifts", "sweets"],
+      "insights": [
+        { "description": "Celebration marking the end of Ramadan" },
+        { "description": "Time to give gifts to loved ones" }
+      ],
+      "offers": [
+        {
+          "type": "promocode",
+          "code": "EID20",
+          "description": "20% off all categories",
+          "categories": ["flowers", "gifts", "sweets"],
+          "countries": ["UAE"],
+          "valid_until": "2024-04-30"
+        }
+      ],
+      "service_advantages": [
+        { "description": "Large selection of holiday gifts" },
+        { "description": "Fast delivery in UAE" }
+      ],
+      "collections": [
+        {
+          "name": "Eid collection of gifts",
+          "categories": ["gifts", "sweets"]
+        }
+      ]
+    }
+  ]

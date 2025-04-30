@@ -1,0 +1,201 @@
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 40px 20px;
+    background-color: #fff;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    color: #111;
+}
+
+h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #222;
+}
+
+/* Описание */
+.description {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    max-width: 800px;
+}
+
+.features {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2.5rem;
+    max-width: 800px;
+}
+
+.features p {
+    margin: 0.4rem 0;
+}
+
+/* Двухколоночный макет */
+.layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.filters-column {
+    flex: 1;
+    max-width: 450px;
+}
+
+.results-column {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #444;
+    font-weight: 500;
+}
+
+select, input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #fafafa;
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+select:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: #aaa;
+    background-color: #fff;
+}
+
+input[type="checkbox"] {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.checkbox-label {
+    display: inline;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background-color: #9cb899; /* Пастельный зеленый */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+}
+
+button:hover {
+    background-color: #88a485;
+}
+
+.results {
+    padding: 30px;
+    background-color: #f8f8f8;
+    border-radius: 12px;
+    height: 100%;
+}
+
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: #888;
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 20px;
+    background-color: #eaeaea;
+    border-radius: 8px;
+}
+
+.result-group {
+    margin-bottom: 1.5rem;
+}
+
+.result-group label {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+textarea {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #c5d5c2; /* Пастельный зеленый как на скриншоте */
+    font-size: 1.1rem;
+    color: #333;
+    resize: none;
+    line-height: 1.5;
+}
+
+textarea:focus {
+    outline: none;
+}
+
+textarea[readonly] {
+    cursor: text;
+}
+
+.count {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: right;
+    margin-top: 0.3rem;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 900px) {
+    .layout {
+        flex-direction: column;
+    }
+    
+    .filters-column, 
+    .results-column {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .results-column {
+        margin-top: 30px;
+    }
+}   
