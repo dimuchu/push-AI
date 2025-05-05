@@ -30,36 +30,66 @@ def load_events_data():
 def index():
     return render_template('index.html')
 
-@app.route('/analyze', methods=['POST'])
-def analyze():
+@app.route('/generate-push', methods=['POST'])
+def generate_push():
     try:
         data = request.json
-        event_id = data.get('event_id')
-        
-        if not event_id:
-            return jsonify({'error': 'No event ID provided'}), 400
-            
-        # Find the event in our data
+        country = data.get('country')
+        language = data.get('language')
+        message_focus = data.get('message_focus')
+        event = data.get('event')
+        functional_advantage = data.get('functional_advantage')
+        category = data.get('category')
+        style = data.get('style')
+        use_emojis = data.get('use_emojis', False)
+
+        # Validate required fields
+        if not all([country, language, message_focus, style]):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Load events data if needed
         events_data = load_events_data()
-        event = next((e for e in events_data if e['id'] == event_id), None)
-        if not event:
-            return jsonify({'error': 'Event not found'}), 404
-            
+        
+        # Prepare context based on message focus
+        context = {
+            'country': country,
+            'language': language,
+            'category': category,
+            'style': style,
+            'use_emojis': use_emojis
+        }
+
+        if message_focus == "Holiday" and event != "No holiday":
+            event_data = next((e for e in events_data if e['name'] == event), None)
+            if event_data:
+                context.update({
+                    'event_name': event_data['name'],
+                    'event_date': event_data['date'],
+                    'offers': event_data.get('offers', []),
+                    'insights': event_data.get('insights', [])
+                })
+        elif message_focus == "Functional Advantage" and functional_advantage:
+            context['functional_advantage'] = functional_advantage
+
         # Prepare the prompt for GPT
         prompt = f"""
-        Проанализируй следующее событие и дай рекомендации по улучшению:
-        
-        Название: {event['title']}
-        Описание: {event['description']}
-        Дата: {event['date']}
-        Место: {event['location']}
-        
-        Пожалуйста, дай:
-        1. Краткий анализ сильных и слабых сторон мероприятия
-        2. Конкретные рекомендации по улучшению
-        3. Предложения по привлечению большего количества участников
-        """
-        
+Generate a push notification with the following context:
+
+Country: {context['country']}
+Language: {context['language']}
+Style: {context['style']}
+Message Focus: {message_focus}
+{"Event: " + context.get('event_name', '') if message_focus == "Holiday" and event != "No holiday" else ""}
+{"Functional Advantage: " + context['functional_advantage'] if message_focus == "Functional Advantage" else ""}
+Category: {context.get('category', 'all')}
+Use Emojis: {'Yes' if context['use_emojis'] else 'No'}
+
+Additional context:
+{json.dumps(context, indent=2)}
+
+Please generate a push notification that follows the style guidelines and includes both a title and body text.
+"""
+
         # Get response from GPT
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini",
@@ -71,12 +101,23 @@ def analyze():
             max_tokens=1000
         )
         
-        # Extract the analysis from the response
-        analysis = response.choices[0].message.content
+        # Extract the generated push notification
+        generated_text = response.choices[0].message.content
         
+        # Parse the response to extract title and body
+        # This is a simple implementation - you might want to make it more robust
+        lines = generated_text.strip().split('\n')
+        title = body = ""
+        for line in lines:
+            if line.lower().startswith('title:'):
+                title = line.split(':', 1)[1].strip()
+            elif line.lower().startswith('body:'):
+                body = line.split(':', 1)[1].strip()
+
         return jsonify({
             'success': True,
-            'analysis': analysis
+            'title': title,
+            'text': body
         })
         
     except Exception as e:

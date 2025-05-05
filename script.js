@@ -71,13 +71,119 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const allLanguages = ["ENG", "RUS"];
-    const textStyles = ["Friendly", "Premium", "Official", "Salesy", "Creative"]; // Названия на английском для промпта
+    
+    // Detailed text styles with their characteristics
+    const textStyles = {
+        "Friendly": {
+            name: "Friendly",
+            description: "Warm and conversational tone",
+            characteristics: [
+                "Personal and warm approach",
+                "Casual language",
+                "Relatable expressions",
+                "Emotionally engaging"
+            ]
+        },
+        "Premium": {
+            name: "Premium",
+            description: "Elegant and sophisticated style",
+            characteristics: [
+                "Refined language",
+                "Exclusive feel",
+                "Emphasis on quality",
+                "Subtle and tasteful"
+            ]
+        },
+        "Official": {
+            name: "Official",
+            description: "Professional and formal approach",
+            characteristics: [
+                "Clear and direct",
+                "Business-appropriate",
+                "Trustworthy tone",
+                "Factual information"
+            ]
+        },
+        "Salesy": {
+            name: "Salesy",
+            description: "Action-oriented promotional style",
+            characteristics: [
+                "Strong call-to-action",
+                "Emphasis on benefits",
+                "Urgency creation",
+                "Value highlighting"
+            ]
+        },
+        "Creative": {
+            name: "Creative",
+            description: "Playful and unconventional approach",
+            characteristics: [
+                "Witty expressions",
+                "Unexpected angles",
+                "Wordplay",
+                "Memorable phrases"
+            ]
+        }
+    };
+
+    // New data structure for functional advantages
+    const functionalAdvantages = {
+        "Delivery": [
+            "Prompt delivery on the requested date or even same-day options",
+            "Delivery in 1200+ cities across 30+ countries",
+            "No address needed – just leave the phone number and we'll reconcile issues"
+        ],
+        "Coverage": [
+            "Send gifts to your loved ones anywhere in the world"
+        ],
+        "Payment": [
+            "Flexible payment options with all major cards accepted"
+        ],
+        "Transparent Ratings": [
+            "Benefit from over 5 million genuine customer reviews and ratings",
+            "Swipe through real photos uploaded by customers"
+        ],
+        "Benefits and Bonuses": [
+            "Enjoy rewards with our WowPass loyalty program",
+            "Earn bonuses on every purchase",
+            "Refer friends for additional benefits",
+            "Get a special welcome 10% promo on your first order",
+            "Celebrate your birthday with a special bonus"
+        ],
+        "Convenient Search": [
+            "Effortlessly find your perfect gift with our categories and filters"
+        ],
+        "Thematic Collections": [
+            "Simplify your gift-giving with our curated collections for any occasion"
+        ],
+        "Photo Before Delivery": [
+            "Ensure your gift matches your expectations with pre-delivery photos"
+        ],
+        "Direct Chat with the Shop": [
+            "Easily communicate with the shop to personalise your order"
+        ],
+        "Assortment": [
+            "Support local businesses with our curated selection of eco-friendly products"
+        ],
+        "Order Tracking": [
+            "Stay informed with real-time order updates from placement to delivery"
+        ],
+        "Postcard": [
+            "Add a personal touch with our complementary postcard"
+        ],
+        "User Collections": [
+            "Create personalised wishlists from diverse shops",
+            "Check out what other people have saved to their collections"
+        ]
+    };
 
     // ====== ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ ФОРМЫ ======
     const form = document.getElementById('push-form');
     const countrySelect = document.getElementById('country');
     const languageSelect = document.getElementById('language');
+    const messageFocusSelect = document.getElementById('message-focus');
     const eventSelect = document.getElementById('event');
+    const functionalAdvantageSelect = document.getElementById('functional-advantage');
     const categorySelect = document.getElementById('category');
     const styleSelect = document.getElementById('style');
     const useEmojisCheckbox = document.getElementById('use-emojis');
@@ -118,30 +224,72 @@ document.addEventListener('DOMContentLoaded', () => {
          populateSelect(languageSelect, allLanguages.sort(), 'Выберите язык');
      }
 
-     function populateTextStyles() {
-         populateSelect(styleSelect, textStyles, 'Выберите стиль');
-     }
+    // Function to populate text styles
+    function populateTextStyles() {
+        const styles = Object.keys(textStyles);
+        populateSelect(styleSelect, styles, 'Select a style');
+    }
+
+    // New function to populate message focus options
+    function populateMessageFocus() {
+        populateSelect(messageFocusSelect, ["Holiday", "Functional Advantage"], 'Select message focus');
+    }
+
+    // New function to populate functional advantages
+    function populateFunctionalAdvantages() {
+        const advantages = Object.keys(functionalAdvantages).sort();
+        populateSelect(functionalAdvantageSelect, advantages, 'Select functional advantage');
+    }
 
     // ====== ОБРАБОТЧИКИ ИЗМЕНЕНИЙ СЕЛЕКТОВ ======
 
+    messageFocusSelect.addEventListener('change', () => {
+        const selectedFocus = messageFocusSelect.value;
+        eventSelect.value = "";
+        functionalAdvantageSelect.value = "";
+        categorySelect.value = "";
+
+        if (selectedFocus === "Holiday") {
+            // Show event select, hide functional advantage select
+            document.getElementById('event-group').style.display = 'block';
+            document.getElementById('functional-advantage-group').style.display = 'none';
+            // If country is selected, populate events
+            if (countrySelect.value) {
+                const relevantEvents = countrySelect.value === "All geo" 
+                    ? mockData 
+                    : mockData.filter(item => item.countries.includes(countrySelect.value));
+                const eventNames = ["No holiday", ...relevantEvents.map(item => item.name)].sort();
+                populateSelect(eventSelect, eventNames, 'Select an event');
+            }
+        } else if (selectedFocus === "Functional Advantage") {
+            // Hide event select, show functional advantage select
+            document.getElementById('event-group').style.display = 'none';
+            document.getElementById('functional-advantage-group').style.display = 'block';
+            populateFunctionalAdvantages();
+        } else {
+            // Hide both if nothing selected
+            document.getElementById('event-group').style.display = 'none';
+            document.getElementById('functional-advantage-group').style.display = 'none';
+        }
+    });
+
     countrySelect.addEventListener('change', () => {
         const selectedCountry = countrySelect.value;
-        eventSelect.value = ""; // Сбросить выбор события
-        categorySelect.value = ""; // Сбросить выбор категории
+        const selectedFocus = messageFocusSelect.value;
+        
+        eventSelect.value = "";
+        categorySelect.value = "";
 
-        if (selectedCountry) {
-            // Фильтруем события по выбранной стране или показываем все события для "All geo"
+        if (selectedCountry && selectedFocus === "Holiday") {
             const relevantEvents = selectedCountry === "All geo" 
                 ? mockData 
                 : mockData.filter(item => item.countries.includes(selectedCountry));
-            const eventNames = relevantEvents.map(item => item.name).sort();
-            populateSelect(eventSelect, eventNames, 'Выберите событие');
-            // Очищаем и деактивируем селектор категорий до выбора события
-            populateSelect(categorySelect, [], 'Выберите категорию');
+            const eventNames = ["No holiday", ...relevantEvents.map(item => item.name)].sort();
+            populateSelect(eventSelect, eventNames, 'Select an event');
+            populateSelect(categorySelect, [], 'Select a category');
         } else {
-            // Если страна не выбрана, очищаем и деактивируем селектор событий и категорий
-            populateSelect(eventSelect, [], 'Выберите событие');
-            populateSelect(categorySelect, [], 'Выберите категорию');
+            populateSelect(eventSelect, [], 'Select an event');
+            populateSelect(categorySelect, [], 'Select a category');
         }
     });
 
@@ -174,88 +322,58 @@ document.addEventListener('DOMContentLoaded', () => {
     // ====== ОБРАБОТЧИК ОТПРАВКИ ФОРМЫ ======
 
     form.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Предотвращаем стандартную отправку формы
+        event.preventDefault();
 
         // Собираем данные из формы
-        const selectedCountry = countrySelect.value;
-        const selectedLanguage = languageSelect.value;
-        const selectedEventName = eventSelect.value;
-        const selectedCategory = categorySelect.value;
-        const selectedStyle = styleSelect.value;
-        const useEmojis = useEmojisCheckbox.checked;
+        const formData = {
+            country: countrySelect.value,
+            language: languageSelect.value,
+            message_focus: messageFocusSelect.value,
+            event: eventSelect.value,
+            functional_advantage: functionalAdvantageSelect.value,
+            category: categorySelect.value,
+            style: styleSelect.value,
+            use_emojis: useEmojisCheckbox.checked
+        };
 
-        // Находим выбранное событие в мок-данных (нужно для инсайтов, офферов и т.д.)
-        // В реальном приложении это будет делать бэкенд после получения имени события от фронтенда
-        const selectedEventData = mockData.find(item =>
-             item.name === selectedEventName && item.countries.includes(selectedCountry)
-        );
-
-        if (!selectedEventData) {
-             console.error("Selected event data not found!");
-             // Возможно, стоит вывести ошибку пользователю
-             return;
-        }
-
-
-        // В этом месте происходит *имитация* отправки данных на бэкенд.
-        // В реальном приложении вы бы отправили эти данные через fetch или XMLHttpRequest
-        // на ваш серверный обработчик.
-        // Пример отправки:
         try {
             const response = await fetch('http://localhost:5001/generate-push', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    country: selectedCountry,
-                    language: selectedLanguage,
-                    eventName: selectedEventName, // Отправляем только имя, бэкенд найдет полные данные
-                    category: selectedCategory,
-                    style: selectedStyle,
-                    useEmojis: useEmojis
-                    // !!! Не отправляйте полные данные инфоповода с фронтенда, это должен делать бэкенд !!!
-                })
+                body: JSON.stringify(formData)
             });
 
             if (response.ok) {
-                const generatedData = await response.json();
-                // Обновляем UI с полученными данными
-                generatedTitleTextarea.value = generatedData.title;
-                generatedTextTextarea.value = generatedData.text;
-                titleCountSpan.textContent = generatedData.title.length;
-                textCountSpan.textContent = generatedData.text.length;
-                
-                // Показываем результаты и скрываем заглушку
-                document.getElementById('empty-state').style.display = 'none';
-                document.getElementById('result-content').style.display = 'block';
+                const result = await response.json();
+                if (result.success) {
+                    // Обновляем UI с полученными данными
+                    generatedTitleTextarea.value = result.title;
+                    generatedTextTextarea.value = result.text;
+                    titleCountSpan.textContent = result.title.length;
+                    textCountSpan.textContent = result.text.length;
+                    
+                    // Показываем результаты и скрываем заглушку
+                    document.getElementById('empty-state').style.display = 'none';
+                    document.getElementById('result-content').style.display = 'block';
+                } else {
+                    console.error('Error in generation:', result.error);
+                    alert('Error generating push notification. Check console for details.');
+                }
             } else {
-                console.error('Ошибка при генерации push-уведомления:', await response.text());
-                alert('Произошла ошибка при генерации push-уведомления. Проверьте консоль для деталей.');
+                console.error('Server error:', await response.text());
+                alert('Server error occurred. Check console for details.');
             }
         } catch (error) {
-            console.error('Ошибка соединения с сервером:', error);
-            alert('Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен.');
-            
-            // === РЕЗЕРВНЫЙ ВАРИАНТ: Отображение сгенерированного текста (заглушка) ===
-            // В случае если сервер недоступен, показываем заглушку
-            const mockTitle = `Push for ${selectedEventName} in ${selectedCountry} (${selectedLanguage})`;
-            const mockText = `Generated text for ${selectedCategory} with ${selectedStyle} style. Emojis: ${useEmojis}. (This is a mock result)`;
-
-            generatedTitleTextarea.value = mockTitle.substring(0, 30);
-            generatedTextTextarea.value = mockText.substring(0, 100);
-
-            titleCountSpan.textContent = generatedTitleTextarea.value.length;
-            textCountSpan.textContent = generatedTextTextarea.value.length;
-
-            // Показываем результаты и скрываем заглушку
-            document.getElementById('empty-state').style.display = 'none';
-            document.getElementById('result-content').style.display = 'block';
+            console.error('Connection error:', error);
+            alert('Could not connect to server. Make sure the backend is running.');
         }
     });
 
     // ====== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ ======
     populateCountries();
     populateLanguages();
+    populateMessageFocus();
     populateTextStyles();
 });
