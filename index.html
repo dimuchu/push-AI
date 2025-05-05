@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,81 +14,81 @@
         <h1>Push Writer</h1>
         
         <div class="description">
-            Чистое и минималистичное пространство для создания push-уведомлений — без отвлекающих факторов.
+            A clean and minimal space for generating push notifications — without distractions.
         </div>
         
         <div class="features">
-            <p>Выберите параметры, и ИИ создаст идеальное уведомление для вашей аудитории.</p>
+            <p>Select the parameters below, and AI will generate the perfect notification for your audience.</p>
         </div>
 
         <div class="layout">
             <div class="filters-column">
                 <form id="push-form">
                     <div class="form-group">
-                        <label for="country">Страна</label>
+                        <label for="country">Country</label>
                         <select id="country" required>
-                            <option value="">Выберите страну</option>
-                            <!-- Опции будут заполнены JavaScript -->
+                            <option value="">Select a country</option>
+                            <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="language">Язык</label>
+                        <label for="language">Language</label>
                         <select id="language" required>
-                            <option value="">Выберите язык</option>
-                            <!-- Опции будут заполнены JavaScript -->
+                            <option value="">Select a language</option>
+                            <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="event">Событие</label>
+                        <label for="event">Event</label>
                         <select id="event" required>
-                            <option value="">Выберите событие</option>
-                            <!-- Опции будут заполнены JavaScript после выбора страны -->
+                            <option value="">Select an event</option>
+                            <!-- Options will be populated by JavaScript after country selection -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="category">Категория товаров</label>
+                        <label for="category">Product Category</label>
                         <select id="category" required>
-                            <option value="">Выберите категорию</option>
-                            <!-- Опции будут заполнены JavaScript после выбора события -->
+                            <option value="">Select a category</option>
+                            <!-- Options will be populated by JavaScript after event selection -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="style">Стиль текста</label>
+                        <label for="style">Text Style</label>
                         <select id="style" required>
-                            <option value="">Выберите стиль</option>
-                            <!-- Опции будут заполнены JavaScript -->
+                            <option value="">Select a style</option>
+                            <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div class="form-group">
                         <input type="checkbox" id="use-emojis">
-                        <label for="use-emojis" class="checkbox-label">Использовать эмодзи</label>
+                        <label for="use-emojis" class="checkbox-label">Use emojis</label>
                     </div>
 
-                    <button type="submit">Создать уведомление</button>
+                    <button type="submit">Generate</button>
                 </form>
             </div>
             
             <div class="results-column">
                 <div class="results" id="results">
-                    <h2>Результат</h2>
+                    <h2>Result</h2>
                     <div class="empty-state" id="empty-state">
-                        <p>Здесь появится ваше уведомление после создания</p>
+                        <p>Your notification will appear here after generation</p>
                     </div>
                     <div class="result-content" id="result-content" style="display: none;">
                         <div class="result-group">
-                            <label>Заголовок</label>
+                            <label>Title</label>
                             <textarea id="generated-title" readonly rows="2"></textarea>
-                            <div class="count"><span id="title-count">0</span>/30 символов</div>
+                            <div class="count"><span id="title-count">0</span>/30 characters</div>
                         </div>
                         <div class="result-group">
-                            <label>Текст</label>
+                            <label>Text</label>
                             <textarea id="generated-text" readonly rows="4"></textarea>
-                            <div class="count"><span id="text-count">0</span>/100 символов</div>
+                            <div class="count"><span id="text-count">0</span>/100 characters</div>
                         </div>
                     </div>
                 </div>

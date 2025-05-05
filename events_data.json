@@ -2,8 +2,8 @@
     {
       "name": "International Women's Day",
       "date": "03-08",
-      "countries": ["Russia", "Ukraine", "Belarus"],
-      "languages": ["RUS", "UA", "ENG"],
+      "countries": ["UAE", "Spain", "Turkey", "United Kingdom", "USA"],
+      "languages": ["ENG", "RUS"],
       "categories": ["flowers", "gifts", "sweets"],
       "insights": [
         { "description": "International Women's Day" },
@@ -35,7 +35,7 @@
       "name": "Eid al-Fitr",
       "date": "floating",
       "countries": ["UAE"],
-      "languages": ["ENG", "RUS", "AZ"],
+      "languages": ["ENG", "RUS"],
       "categories": ["gifts", "sweets"],
       "insights": [
         { "description": "Celebration marking the end of Ramadan" },

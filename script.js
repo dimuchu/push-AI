@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             "name": "International Women's Day",
             "date": "03-08",
-            "countries": ["Russia", "Ukraine", "Belarus"],
-            "languages": ["RUS", "UA", "ENG"],
+            "countries": ["UAE", "Spain", "Turkey", "United Kingdom", "USA"],
+            "languages": ["ENG", "RUS"],
             "categories": ["flowers", "gifts", "sweets"],
             "insights": [{ "description": "International Women's Day" }],
             "offers": [{ "type": "promocode", "code": "WOMEN20", "description": "20% off bouquets", "categories": ["flowers"], "valid_until": "2024-03-15" }],
@@ -17,31 +17,31 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         {
             "name": "Mother's Day",
-            "date": "last Sunday of November", // Пример описательной даты
-            "countries": ["Russia"],
-            "languages": ["RUS", "ENG"],
+            "date": "last Sunday of November",
+            "countries": ["UAE", "Spain", "Turkey", "United Kingdom", "USA"],
+            "languages": ["ENG", "RUS"],
             "categories": ["flowers", "gifts"],
-             "insights": [{ "description": "Day of gratitude for mothers" }],
-             "offers": [{ "type": "discount", "description": "15% off gifts for mothers", "categories": ["gifts"]}],
+            "insights": [{ "description": "Day of gratitude for mothers" }],
+            "offers": [{ "type": "discount", "description": "15% off gifts for mothers", "categories": ["gifts"]}],
             "service_advantages": [{ "description": "Original gifts for loved ones" }],
             "collections": [{ "name": "Gifts for Mom collection", "categories": ["gifts"] }]
         },
         {
-             "name": "Black Friday",
-             "date": "last Friday of November",
-             "countries": ["Russia", "Ukraine", "Belarus", "Germany", "Spain", "Poland"],
-             "languages": ["RUS", "UA", "ENG", "DE", "ES", "PL"],
-             "categories": ["flowers", "gifts", "sweets", "all"],
-              "insights": [{ "description": "Huge discounts and promotions" }],
-              "offers": [{ "type": "discount", "description": "Up to 70% off all categories", "code": "BLACKFRIDAY"}],
-             "service_advantages": [{ "description": "Huge assortment of products" }],
-             "collections": [] // Нет подборок
+            "name": "Black Friday",
+            "date": "last Friday of November",
+            "countries": ["UAE", "Spain", "Turkey", "United Kingdom", "USA"],
+            "languages": ["ENG", "RUS"],
+            "categories": ["flowers", "gifts", "sweets", "all"],
+            "insights": [{ "description": "Huge discounts and promotions" }],
+            "offers": [{ "type": "discount", "description": "Up to 70% off all categories", "code": "BLACKFRIDAY"}],
+            "service_advantages": [{ "description": "Huge assortment of products" }],
+            "collections": []
         },
-         {
+        {
             "name": "Eid al-Fitr",
             "date": "floating",
             "countries": ["UAE"],
-            "languages": ["ENG", "RUS", "AZ"], // Пример: для ОАЭ могут быть актуальны ENG, RUS, AZ
+            "languages": ["ENG", "RUS"],
             "categories": ["gifts", "sweets"],
             "insights": [
               { "description": "Celebration marking the end of Ramadan" },
@@ -67,11 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 "categories": ["gifts", "sweets"]
               }
             ]
-         }
-        // ... добавьте остальные инфоповоды по необходимости
+        }
     ];
 
-    const allLanguages = ["RUS", "ENG", "UA", "DE", "ES", "PT", "FR", "TR", "IT", "HU", "AZ", "PL", "KZ"];
+    const allLanguages = ["ENG", "RUS"];
     const textStyles = ["Friendly", "Premium", "Official", "Salesy", "Creative"]; // Названия на английском для промпта
 
     // ====== ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ ФОРМЫ ======
@@ -105,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateCountries() {
         const countries = [...new Set(mockData.flatMap(item => item.countries))].sort();
-        populateSelect(countrySelect, countries, 'Выберите страну');
-         // При загрузке страницы, остальные селекты будут пустыми
+        populateSelect(countrySelect, ["All geo", ...countries], 'Выберите страну');
+        // При загрузке страницы, остальные селекты будут пустыми
         populateSelect(eventSelect, [], 'Выберите событие');
         populateSelect(categorySelect, [], 'Выберите категорию');
     }
@@ -131,14 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
         categorySelect.value = ""; // Сбросить выбор категории
 
         if (selectedCountry) {
-            // Фильтруем события по выбранной стране
-            const relevantEvents = mockData.filter(item =>
-                 item.countries.includes(selectedCountry)
-            );
-             const eventNames = relevantEvents.map(item => item.name).sort();
+            // Фильтруем события по выбранной стране или показываем все события для "All geo"
+            const relevantEvents = selectedCountry === "All geo" 
+                ? mockData 
+                : mockData.filter(item => item.countries.includes(selectedCountry));
+            const eventNames = relevantEvents.map(item => item.name).sort();
             populateSelect(eventSelect, eventNames, 'Выберите событие');
-             // Очищаем и деактивируем селектор категорий до выбора события
-             populateSelect(categorySelect, [], 'Выберите категорию');
+            // Очищаем и деактивируем селектор категорий до выбора события
+            populateSelect(categorySelect, [], 'Выберите категорию');
         } else {
             // Если страна не выбрана, очищаем и деактивируем селектор событий и категорий
             populateSelect(eventSelect, [], 'Выберите событие');
