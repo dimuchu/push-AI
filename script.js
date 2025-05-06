@@ -210,10 +210,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateCountries() {
         const countries = [...new Set(mockData.flatMap(item => item.countries))].sort();
-        populateSelect(countrySelect, ["All geo", ...countries], 'Выберите страну');
+        populateSelect(countrySelect, ["All geo", ...countries], 'Select a country');
         // При загрузке страницы, остальные селекты будут пустыми
-        populateSelect(eventSelect, [], 'Выберите событие');
-        populateSelect(categorySelect, [], 'Выберите категорию');
+        populateSelect(eventSelect, [], 'Select an event');
+        populateSelect(categorySelect, [], 'Select a category');
     }
 
      function populateLanguages() {
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
          // но в ТЗ указано, что языки из фиксированного списка.
          // В MVP пока просто заполним всеми доступными.
          // В будущем: возможно, бэкенд будет возвращать только актуальные для связки Страна-Событие языки.
-         populateSelect(languageSelect, allLanguages.sort(), 'Выберите язык');
+         populateSelect(languageSelect, allLanguages.sort(), 'Select a language');
      }
 
     // Function to populate text styles
@@ -296,10 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
     eventSelect.addEventListener('change', () => {
         const selectedCountry = countrySelect.value;
         const selectedEventName = eventSelect.value;
-         categorySelect.value = ""; // Сбросить выбор категории
+        categorySelect.value = ""; // Сбросить выбор категории
 
         if (selectedCountry && selectedEventName) {
-             // Находим выбранное событие по имени и стране
+            // Находим выбранное событие по имени и стране
             const selectedEvent = mockData.find(item =>
                 item.name === selectedEventName && item.countries.includes(selectedCountry)
             );
@@ -307,14 +307,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedEvent) {
                 // Получаем уникальные категории для этого события
                 const categories = [...new Set(selectedEvent.categories)].sort();
-                populateSelect(categorySelect, categories, 'Выберите категорию');
+                populateSelect(categorySelect, categories, 'Select a category');
             } else {
-                 // Если событие не найдено (чего в мок-данных быть не должно), очищаем категории
-                 populateSelect(categorySelect, [], 'Выберите категорию');
+                // Если событие не найдено (чего в мок-данных быть не должно), очищаем категории
+                populateSelect(categorySelect, [], 'Select a category');
             }
         } else {
-             // Если страна или событие не выбраны, очищаем и деактивируем категории
-            populateSelect(categorySelect, [], 'Выберите категорию');
+            // Если страна или событие не выбраны, очищаем и деактивируем категории
+            populateSelect(categorySelect, [], 'Select a category');
         }
     });
 
@@ -323,6 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        console.log('Form submitted');
 
         // Собираем данные из формы
         const formData = {
@@ -335,8 +336,10 @@ document.addEventListener('DOMContentLoaded', () => {
             style: styleSelect.value,
             use_emojis: useEmojisCheckbox.checked
         };
+        console.log('Form data:', formData);
 
         try {
+            console.log('Sending request to server...');
             const response = await fetch('http://localhost:5001/generate-push', {
                 method: 'POST',
                 headers: {
@@ -344,10 +347,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify(formData)
             });
+            console.log('Got response:', response);
 
             if (response.ok) {
                 const result = await response.json();
+                console.log('Response data:', result);
                 if (result.success) {
+                    console.log('Updating UI with result');
                     // Обновляем UI с полученными данными
                     generatedTitleTextarea.value = result.title;
                     generatedTextTextarea.value = result.text;
@@ -357,12 +363,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Показываем результаты и скрываем заглушку
                     document.getElementById('empty-state').style.display = 'none';
                     document.getElementById('result-content').style.display = 'block';
+                    console.log('UI updated successfully');
                 } else {
                     console.error('Error in generation:', result.error);
                     alert('Error generating push notification. Check console for details.');
                 }
             } else {
-                console.error('Server error:', await response.text());
+                const errorText = await response.text();
+                console.error('Server error:', errorText);
                 alert('Server error occurred. Check console for details.');
             }
         } catch (error) {
