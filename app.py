@@ -28,7 +28,12 @@ def load_events_data():
 # Добавляем маршрут для проверки работы сервера
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return app.send_static_file('index.html')
+
+# Маршруты для статических файлов
+@app.route('/<path:filename>')
+def static_files(filename):
+    return app.send_static_file(filename)
 
 @app.route('/generate-push', methods=['POST'])
 def generate_push():
@@ -178,4 +183,5 @@ Rules:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001) 
+    port = int(os.environ.get('PORT', 5001))
+    app.run(debug=False, host='0.0.0.0', port=port) 

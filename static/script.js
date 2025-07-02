@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('http://localhost:5001/generate-push', {
+            const response = await fetch('/generate-push', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
