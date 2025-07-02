@@ -1,3 +1,4 @@
+gunicorn
 flask==2.2.3
 flask-cors==3.0.10
 openai==1.12.0
