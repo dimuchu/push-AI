@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import json
 import os
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Загружаем переменные окружения из .env файла
@@ -10,7 +10,7 @@ load_dotenv()
 
 # Инициализация Flask приложения
 app = Flask(__name__)
-CORS(app)  # Включаем CORS для возможности делать запросы с другого домена
+CORS(app, resources={r"/*": {"origins": "*"}})  # Включаем CORS для возможности делать запросы с любого домена
 
 # Создаем клиент OpenAI с минимальными параметрами
 api_key = os.getenv("OPENAI_API_KEY")
@@ -18,7 +18,7 @@ if not api_key:
     raise ValueError("No OpenAI API key found. Please set OPENAI_API_KEY in your .env file")
 
 # Initialize OpenAI client
-openai.api_key = api_key
+client = OpenAI(api_key=api_key)
 
 # Загружаем данные из JSON файла
 def load_events_data():
@@ -33,6 +33,7 @@ def index():
 @app.route('/generate-push', methods=['POST'])
 def generate_push():
     try:
+        print("Received request data:", request.json)  # Debug print
         data = request.json
         country = data.get('country')
         language = data.get('language')
@@ -43,12 +44,16 @@ def generate_push():
         style = data.get('style')
         use_emojis = data.get('use_emojis', False)
 
+        print(f"Parsed parameters: country={country}, language={language}, message_focus={message_focus}, style={style}")  # Debug print
+
         # Validate required fields
         if not all([country, language, message_focus, style]):
+            print("Missing required fields")  # Debug print
             return jsonify({'error': 'Missing required fields'}), 400
 
         # Load events data if needed
         events_data = load_events_data()
+        print("Loaded events data")  # Debug print
         
         # Prepare context based on message focus
         context = {
@@ -88,31 +93,79 @@ Additional context:
 {json.dumps(context, indent=2)}
 
 Please generate a push notification that follows the style guidelines and includes both a title and body text.
+Your response MUST follow this exact format:
+
+Title: [your title here]
+Body: [your body text here]
+
+Example response:
+Title: Fast Delivery Today! 🚚
+Body: Get your order within 2 hours in any city. Order now and enjoy express shipping!
+
+Remember:
+- Title must be no longer than 30 characters
+- Body text must not exceed 100 characters
+- Use the specified language ({context['language']})
+- Match the specified style ({context['style']})
 """
 
         # Get response from GPT
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
+        print("\n=== Sending request to OpenAI ===")
+        print("Prompt:", prompt)
+        
+        response = client.chat.completions.create(
+            model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a creative AI copywriter specialized in push notifications for e-commerce. Your job is to craft catchy, concise, and locally relevant push messages that drive clicks and prompt action. You always consider the context: country, language, event, product category, user behavior (if provided). Your message must align with the core focus — whether it's a holiday, a promotional offer, or a functional benefit of the service. You adapt your tone based on the target audience (female/male, new/returning, active/inactive) and stick to a lively, human, emotionally engaging writing style — unless told otherwise.\n\nFollow this strict format: the **title** must be no longer than 30 characters (including emoji), and the **body text** must not exceed 100 characters (also including emoji). Emojis are allowed in both blocks, but only when they strengthen the message — don't overuse them. Mention promo codes or offers briefly if they are provided. If the message is tied to a holiday, highlight the emotion or celebration. If the focus is on a functional benefit (e.g. fast delivery), emphasize why it's valuable for the customer. Avoid clichés like \"best quality at the best price\" and don't start messages with formal openings like \"Dear customer\" — this is not email.\n\nUse short, sharp, emotional hooks in the title, and deliver quick value or action in the body text. Your writing must be clear, personal, and never robotic. Do not invent details beyond the input data. Think like a smart marketer with a sense of humor, empathy, and urgency."},
+                {"role": "system", "content": """You are a creative AI copywriter specialized in push notifications for e-commerce. Your task is to generate push notifications in the exact format specified:
+
+Title: [title text]
+Body: [body text]
+
+Rules:
+1. ALWAYS use this exact format with "Title:" and "Body:" prefixes
+2. Title must be no longer than 30 characters (including emoji)
+3. Body text must not exceed 100 characters (including emoji)
+4. Write in the requested language
+5. Match the requested style
+6. Be concise and action-oriented
+7. Do not use generic phrases like "best quality" or "Dear customer"
+8. Make the message personal and emotionally engaging
+9. Include emojis only when requested and when they add value
+10. Focus on the main benefit or occasion specified in the request"""},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
             max_tokens=1000
         )
         
+        print("\n=== Received OpenAI Response ===")
+        print("Response object:", response)
+        print("Response type:", type(response))
+        print("Response attributes:", dir(response))
+        
         # Extract the generated push notification
         generated_text = response.choices[0].message.content
+        print("\n=== Processing Generated Text ===")
+        print("Raw text:", repr(generated_text))
         
         # Parse the response to extract title and body
-        # This is a simple implementation - you might want to make it more robust
         lines = generated_text.strip().split('\n')
+        print("\nSplit lines:", lines)
         title = body = ""
         for line in lines:
+            print("\nProcessing line:", repr(line))
             if line.lower().startswith('title:'):
                 title = line.split(':', 1)[1].strip()
+                print("Found title:", repr(title))
             elif line.lower().startswith('body:'):
                 body = line.split(':', 1)[1].strip()
+                print("Found body:", repr(body))
+            else:
+                print("Line doesn't match title or body pattern")
+
+        print("\n=== Final Result ===")
+        print(f"Title: {repr(title)}")
+        print(f"Body: {repr(body)}")
 
         return jsonify({
             'success': True,
@@ -121,6 +174,7 @@ Please generate a push notification that follows the style guidelines and includ
         })
         
     except Exception as e:
+        print("Error occurred:", str(e))  # Debug print
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

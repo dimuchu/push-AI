@@ -189,11 +189,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const useEmojisCheckbox = document.getElementById('use-emojis');
 
     const resultsDiv = document.getElementById('results');
-    const generatedTitleTextarea = document.getElementById('generated-title');
-    const generatedTextTextarea = document.getElementById('generated-text');
-    const titleCountSpan = document.getElementById('title-count');
-    const textCountSpan = document.getElementById('text-count');
+    // const generatedTitleTextarea = document.getElementById('generated-title'); // Old textarea
+    // const generatedTextTextarea = document.getElementById('generated-text'); // Old textarea
+    // const titleCountSpan = document.getElementById('title-count'); // Old count span
+    // const textCountSpan = document.getElementById('text-count'); // Old count span
 
+    // Preview elements for iOS 
+    const lockscreenTimeElem = document.getElementById('lockscreen-time');
+    const lockscreenDateElem = document.getElementById('lockscreen-date');
+    const iosTitleElem = document.getElementById('ios-title');
+    const iosBodyElem = document.getElementById('ios-body');
+
+    // Character counts
+    const titleCountDisplay = document.getElementById('title-count-display');
+    const textCountDisplay = document.getElementById('text-count-display');
+
+    // Additional UI elements for state management
+    const submitButton = form.querySelector('button[type="submit"]');
+    const emptyStateDiv = document.getElementById('empty-state');
+    const resultContentDiv = document.getElementById('result-content');
+
+    // Development mode flag
+    const isDevelopment = true; // Переключите в false для production режима
+
+    // Sample notification for development
+    const sampleNotification = {
+        title: "Seamless Shopping Experience",
+        text: "Discover our convenient search feature. Find exactly what you want in less time. Try it now!"
+    };
+
+    // Initially disable and remove required from hidden selects
+    eventSelect.required = false;
+    eventSelect.disabled = true;
+    functionalAdvantageSelect.required = false;
+    functionalAdvantageSelect.disabled = true;
 
     // ====== ФУНКЦИИ ЗАПОЛНЕНИЯ СЕЛЕКТОВ ======
 
@@ -249,10 +278,20 @@ document.addEventListener('DOMContentLoaded', () => {
         functionalAdvantageSelect.value = "";
         categorySelect.value = "";
 
+        // Get groups
+        const eventGroup = document.getElementById('event-group');
+        const advantageGroup = document.getElementById('functional-advantage-group');
+
         if (selectedFocus === "Holiday") {
             // Show event select, hide functional advantage select
-            document.getElementById('event-group').style.display = 'block';
-            document.getElementById('functional-advantage-group').style.display = 'none';
+            eventGroup.style.display = 'block';
+            advantageGroup.style.display = 'none';
+            // Enable and require eventSelect
+            eventSelect.required = true;
+            eventSelect.disabled = false;
+            // Disable functionalAdvantageSelect
+            functionalAdvantageSelect.required = false;
+            functionalAdvantageSelect.disabled = true;
             // If country is selected, populate events
             if (countrySelect.value) {
                 const relevantEvents = countrySelect.value === "All geo" 
@@ -263,10 +302,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (selectedFocus === "Functional Advantage") {
             // Hide event select, show functional advantage select
-            document.getElementById('event-group').style.display = 'none';
-            document.getElementById('functional-advantage-group').style.display = 'block';
+            eventGroup.style.display = 'none';
+            advantageGroup.style.display = 'block';
+            // Disable eventSelect
+            eventSelect.required = false;
+            eventSelect.disabled = true;
+            // Enable and require functionalAdvantageSelect
+            functionalAdvantageSelect.required = true;
+            functionalAdvantageSelect.disabled = false;
             populateFunctionalAdvantages();
         } else {
+            // Hide both and disable
+            eventGroup.style.display = 'none';
+            advantageGroup.style.display = 'none';
+            eventSelect.required = false;
+            eventSelect.disabled = true;
             // Hide both if nothing selected
             document.getElementById('event-group').style.display = 'none';
             document.getElementById('functional-advantage-group').style.display = 'none';
@@ -318,14 +368,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ====== ФУНКЦИЯ ОБНОВЛЕНИЯ ВРЕМЕНИ И ДАТЫ ======
+    function updateLockScreenDateTime() {
+        const now = new Date();
+        // Форматируем время для iOS (ЧЧ:ММ)
+        const hours = now.getHours().toString().padStart(2, '0');  
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const timeString = hours + ':' + minutes;
+
+        // Форматируем дату для iOS (День недели, Число Месяц)
+        const locale = navigator.language || 'en-US';
+        const iosDateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+        const dateString = now.toLocaleDateString(locale, iosDateOptions);
+
+        // Обновляем дату и время iPhone
+        lockscreenTimeElem.textContent = timeString;
+        lockscreenDateElem.textContent = dateString;
+    }
+
+    // Initial call and setup sample notification if in development mode
+    updateLockScreenDateTime();
+    if (isDevelopment) {
+        // Show sample notification immediately
+        iosTitleElem.textContent = sampleNotification.title;
+        iosBodyElem.textContent = sampleNotification.text;
+        titleCountDisplay.textContent = sampleNotification.title.length;
+        textCountDisplay.textContent = sampleNotification.text.length;
+        emptyStateDiv.style.display = 'none';
+        resultContentDiv.classList.add('show');
+    }
 
     // ====== ОБРАБОТЧИК ОТПРАВКИ ФОРМЫ ======
-
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        console.log('Form submitted');
+        
+        if (isDevelopment) {
+            // В режиме разработки просто показываем тестовое уведомление
+            updateLockScreenDateTime();
+            iosTitleElem.textContent = sampleNotification.title;
+            iosBodyElem.textContent = sampleNotification.text;
+            titleCountDisplay.textContent = sampleNotification.title.length;
+            textCountDisplay.textContent = sampleNotification.text.length;
+            emptyStateDiv.style.display = 'none';
+            resultContentDiv.classList.add('show');
+            return;
+        }
 
-        // Собираем данные из формы
+        // Production code continues here...
+        updateLockScreenDateTime();
+        submitButton.disabled = true;
+        submitButton.classList.add('loading');
+        resultsDiv.classList.remove('error');
+        emptyStateDiv.style.display = 'none';
+        resultContentDiv.classList.remove('show');
+
         const formData = {
             country: countrySelect.value,
             language: languageSelect.value,
@@ -336,10 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
             style: styleSelect.value,
             use_emojis: useEmojisCheckbox.checked
         };
-        console.log('Form data:', formData);
 
         try {
-            console.log('Sending request to server...');
             const response = await fetch('http://localhost:5001/generate-push', {
                 method: 'POST',
                 headers: {
@@ -347,35 +441,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify(formData)
             });
-            console.log('Got response:', response);
 
             if (response.ok) {
                 const result = await response.json();
-                console.log('Response data:', result);
                 if (result.success) {
-                    console.log('Updating UI with result');
-                    // Обновляем UI с полученными данными
-                    generatedTitleTextarea.value = result.title;
-                    generatedTextTextarea.value = result.text;
-                    titleCountSpan.textContent = result.title.length;
-                    textCountSpan.textContent = result.text.length;
-                    
-                    // Показываем результаты и скрываем заглушку
-                    document.getElementById('empty-state').style.display = 'none';
-                    document.getElementById('result-content').style.display = 'block';
-                    console.log('UI updated successfully');
+                    iosTitleElem.textContent = result.title;
+                    iosBodyElem.textContent = result.text;
+                    titleCountDisplay.textContent = result.title.length;
+                    textCountDisplay.textContent = result.text.length;
+                    emptyStateDiv.style.display = 'none';
+                    resultContentDiv.classList.add('show');
                 } else {
-                    console.error('Error in generation:', result.error);
+                    resultsDiv.classList.add('error');
+                    emptyStateDiv.style.display = 'block';
+                    resultContentDiv.classList.remove('show');
                     alert('Error generating push notification. Check console for details.');
                 }
             } else {
                 const errorText = await response.text();
                 console.error('Server error:', errorText);
+                resultsDiv.classList.add('error');
+                emptyStateDiv.style.display = 'block';
+                resultContentDiv.classList.remove('show');
                 alert('Server error occurred. Check console for details.');
             }
         } catch (error) {
             console.error('Connection error:', error);
+            resultsDiv.classList.add('error');
+            emptyStateDiv.style.display = 'block';
+            resultContentDiv.classList.remove('show');
             alert('Could not connect to server. Make sure the backend is running.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.classList.remove('loading');
         }
     });
 

@@ -26,7 +26,7 @@
                 <form id="push-form">
                     <div class="form-group">
                         <label for="country">Country</label>
-                        <select id="country" required>
+                        <select id="country" name="country" required>
                             <option value="">Select a country</option>
                             <!-- Options will be populated by JavaScript -->
                         </select>
@@ -34,23 +34,39 @@
 
                     <div class="form-group">
                         <label for="language">Language</label>
-                        <select id="language" required>
+                        <select id="language" name="language" required>
                             <option value="">Select a language</option>
                             <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div class="form-group">
+                        <label for="message-focus">Message Focus</label>
+                        <select id="message-focus" name="message_focus" required>
+                            <option value="">Select message focus</option>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="event-group" style="display: none;">
                         <label for="event">Event</label>
-                        <select id="event" required>
+                        <select id="event" name="event">
                             <option value="">Select an event</option>
-                            <!-- Options will be populated by JavaScript after country selection -->
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="functional-advantage-group" style="display: none;">
+                        <label for="functional-advantage">Functional Advantage</label>
+                        <select id="functional-advantage" name="functional_advantage">
+                            <option value="">Select functional advantage</option>
+                            <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="category">Product Category</label>
-                        <select id="category" required>
+                        <select id="category" name="category" required>
                             <option value="">Select a category</option>
                             <!-- Options will be populated by JavaScript after event selection -->
                         </select>
@@ -58,14 +74,14 @@
 
                     <div class="form-group">
                         <label for="style">Text Style</label>
-                        <select id="style" required>
+                        <select id="style" name="style" required>
                             <option value="">Select a style</option>
                             <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <input type="checkbox" id="use-emojis">
+                        <input type="checkbox" id="use-emojis" name="use_emojis">
                         <label for="use-emojis" class="checkbox-label">Use emojis</label>
                     </div>
 
@@ -75,20 +91,51 @@
             
             <div class="results-column">
                 <div class="results" id="results">
-                    <h2>Result</h2>
+                    <h2 class="results-title">Result</h2>
                     <div class="empty-state" id="empty-state">
                         <p>Your notification will appear here after generation</p>
                     </div>
                     <div class="result-content" id="result-content" style="display: none;">
-                        <div class="result-group">
-                            <label>Title</label>
-                            <textarea id="generated-title" readonly rows="2"></textarea>
-                            <div class="count"><span id="title-count">0</span>/30 characters</div>
+                        <div class="previews">
+                            <!-- iOS Lock Screen Preview -->
+                            <div class="preview preview-ios">
+                                <div class="iphone-frame">
+                                    <div class="iphone-screen">
+                                        <!-- Dynamic Island -->
+                                        <div class="iphone-notch"></div>
+                                        
+                                        <!-- Time and Date -->
+                                        <div class="lockscreen-time-date-wrapper">
+                                            <div id="lockscreen-date" class="lockscreen-date"></div>
+                                            <div id="lockscreen-time" class="lockscreen-time"></div>
+                                        </div>
+                                        
+                                        <!-- Notification -->
+                                        <div class="notification-bubble-ios">
+                                            <div class="app-icon-ios"></div>
+                                            <div class="notification-text-content-ios">
+                                                <div class="notification-header-ios">
+                                                    <!--<div class="app-name-ios">Push Writer</div> -->
+                                                    <div class="notification-timestamp-ios">now</div>
+                                                </div>
+                                                <div id="ios-title" class="notification-title-ios"></div>
+                                                <div id="ios-body" class="notification-body-ios"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="result-group">
-                            <label>Text</label>
-                            <textarea id="generated-text" readonly rows="4"></textarea>
-                            <div class="count"><span id="text-count">0</span>/100 characters</div>
+                        <!-- Character counts remain outside previews -->
+                        <div class="result-counts">
+                            <div class="count-group">
+                                <span class="count-label">Title:</span>
+                                <span id="title-count-display">0</span>/30 characters
+                            </div>
+                            <div class="count-group">
+                                <span class="count-label">Text:</span>
+                                <span id="text-count-display">0</span>/100 characters
+                            </div>
                         </div>
                     </div>
                 </div>
